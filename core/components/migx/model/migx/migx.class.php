@@ -178,7 +178,7 @@ class Migx {
         $classname = $scriptProperties['classname'];
         $groupby = $modx->getOption('groupby', $scriptProperties, '');
 
-        $debug = $modx->getOption('debug', $scriptProperties, false);
+        $debug = isset($scriptProperties['debug']) ? $scriptProperties['debug'] : false;
 
         $c = $xpdo->newQuery($classname);
 
@@ -274,7 +274,12 @@ class Migx {
             echo $level . ' - ';
             */
 
-            if ($oldgroupvalue[$level] == $newgroupvalue) {
+            if (!isset($group_keys[$level])){
+                $group_keys[$level] = array(); 
+                $group_keys[$level][$key] = $key;   
+            }            
+
+            if (isset($oldgroupvalue[$level]) && $oldgroupvalue[$level] == $newgroupvalue) {
                 //still the same group
                 if ($fields['_last']) {
                     //last item at all
@@ -289,7 +294,7 @@ class Migx {
                         $group_idx++;
                     }
                 }
-            } else {
+            } elseif (isset($group_keys[$level])) {
                 //new group has started
                 $group_count = count($group_keys[$level]);
                 $group_idx = 1;
@@ -313,6 +318,9 @@ class Migx {
             }
 
             $group_keys[$level][] = $key;
+            if (!isset($oldgroupvalue[$level])){
+                $oldgroupvalue[$level] = $newgroupvalue;
+            }            
         }
 
 
@@ -880,14 +888,13 @@ class Migx {
                     if (file_exists($configFile)) {
                         include ($configFile);
                     }
-                    if (!empty($packageName)) {
+                    if (isset($configpath) && !empty($packageName)) {
                         $configFile = $configpath . $config . '.config.inc.php'; // [ file ]
                         if (file_exists($configFile)) {
                             include ($configFile);
                         }
                     }
                 }
-
 
                 //print_r($this->customconfigs['tabs']) ;
 
@@ -1673,7 +1680,7 @@ class Migx {
                             $row['_this.value'] = $value;
                             $properties = $row;
                             $properties['_request'] = $_REQUEST;
-                            $properties['_media_source_id'] = $this->config['media_source_id'];
+                            $properties['_media_source_id'] = isset($this->config['media_source_id']) ? $this->config['media_source_id'] : 0;
                             $renderchunktpl = $this->modx->getOption('_renderchunktpl', $option, '');
                             if (!empty($renderchunktpl)) {
                                 $row[$column] = $this->renderChunk($renderchunktpl, $properties, false);
@@ -2755,7 +2762,7 @@ class Migx {
             //$parent = $workingobject->get('parent');
             $c = $xpdo->newQuery($classname);
             //$c->where(array('deleted'=>0 , 'parent'=>$parent));
-            $c->select($xpdo->getSelectColumns($classname, $classname));
+            $c->select($xpdo->getSelectColumns($classname, $c->getAlias()));
 
             if (!empty($joinalias)) {
                 /*

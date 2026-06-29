@@ -101,10 +101,6 @@ $classname = $config['classname'];
 $auto_create_tables = isset($config['auto_create_tables']) ? $config['auto_create_tables'] : true;
 $modx->setOption(xPDO::OPT_AUTO_CREATE_TABLES, $auto_create_tables);
 
-if ($modx->lexicon) {
-    $modx->lexicon->load($packageName . ':default');
-}
-
 $co_id = $modx->getOption('co_id', $scriptProperties, '');
 
 if (isset($scriptProperties['data'])) {
@@ -318,7 +314,7 @@ switch ($task) {
         }
         if (empty($postvalues['ow_publishedon'])) {
             $postvalues['publishedon'] = $tempvalues['publishedon'];
-            if ($tempvalues['pubishedon'] < 0){
+            if ($tempvalues['publishedon'] < 0){
                 unset($postvalues['publishedon']);
             }            
         }

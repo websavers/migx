@@ -1,5 +1,7 @@
 <?php
 
+$is_modx3 = $this->is_modx3();
+
 /*
 * the packageName where you have your classes
 * this can be used in processors
@@ -97,6 +99,7 @@ if (!empty($_REQUEST['tempParams']) && $_REQUEST['tempParams'] == 'export_import
     $prefixes[] = 'Custom Prefix==1';
     
     $c = $this->modx->newQuery($classname);
+    $c->select(['MIN(id) AS id','category']);
     $c->sortby('category');
     $c->groupby('category');
     $categorylist = array();
@@ -105,6 +108,14 @@ if (!empty($_REQUEST['tempParams']) && $_REQUEST['tempParams'] == 'export_import
         foreach ($collection as $object){
             $categorylist[] = $object->get('category');
         }
+    }
+
+    $hide_actionscolumn = '';
+     
+    if ($is_modx3){
+        $hide_actionscolumn = '
+        {"field":"extended.hide_actionscolumn","caption":"Hide Actions Column","inputTVtype":"checkbox","inputOptionValues":"hide==1"},    
+        ';
     }
 
     $tabs = '
@@ -132,6 +143,7 @@ if (!empty($_REQUEST['tempParams']) && $_REQUEST['tempParams'] == 'export_import
     {"field":"extended.multiple_formtabs_optionsvalue","caption":"Multiple Formtabs Optionsvalue","description":"Value in formtabs-selectbox for this config. Default is the name of this config."}        
 ]},
 {"caption":"Columns", "fields": [
+    ' . $hide_actionscolumn . '
     {"field":"columns","caption":"Columns","inputTVtype":"' . $inputType . '","configs":"migxcolumns"}
 ]},
 {"caption":"Contextmenues", "fields": [
@@ -171,7 +183,10 @@ if (!empty($_REQUEST['tempParams']) && $_REQUEST['tempParams'] == 'export_import
     {"field":"extended.check_resid_TV","caption":"Check Resource TV"},
     {"field":"extended.join_alias","caption":"Join Alias"},
     {"field":"extended.has_jointable","caption":"Has Extra Connection Table","inputTVtype":"listbox","inputOptionValues":"yes||no","default":"yes"},
+    {"field":"extended.getlistselectfields","caption":"Select Fields"},
+    {"field":"extended.getlistspecialfields","caption":"Select Special Fields","description":"raw select"},
     {"field":"extended.getlistwhere","caption":"Where"},
+    {"field":"extended.getlistgroupby","caption":"Group By"},        
     {"field":"extended.joins","caption":"Joins","inputTVtype":"textarea"},
     {"field":"extended.hooksnippets","caption":"Hook Snippets","description":"Example:{\"aftersave\":\"myaftersave_snippet\"}","inputTVtype":"textarea"}
 ]},

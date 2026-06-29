@@ -99,6 +99,8 @@ switch ($task) {
         $fieldid = 0;
         $postvalues = array();
 
+        $fieldsarray = $modx->migx->extractFieldsFromTabs($tabs);
+
         foreach ($scriptProperties as $field => $value) {
             $fieldid++;
             //$value = $scriptProperties['tv'.$fieldid];
@@ -131,7 +133,7 @@ switch ($task) {
                 $value = implode('||', $featureInsert);
             }
 
-            if ($field != 'configs') {
+            if ($field != 'configs' && array_key_exists($field,$fieldsarray)) {
                 $field = explode('.', $field);
                 if (count($field) > 1) {
                     //extended field (json-array)
@@ -142,7 +144,6 @@ switch ($task) {
                     }
                 }
             }
-
 
         }
         if (isset($postvalues['newcategory']) && !empty($postvalues['newcategory'])) {
